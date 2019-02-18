@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleTagProcessor.Data\SimpleTagProcessor.Data.csproj" />
+    <ProjectReference Include="..\SimpleTagProcessor.Common\SimpleTagProcessor.Common.csproj" />
   </ItemGroup>
 
 </Project>
