@@ -2,13 +2,23 @@
 {
     public enum TagStatus
     {
-        UnprocessedTag,
-        ConvertedToBit,
-        Constructed,
-        ValidTag,
-        InvalidHEXValue,
-        InvalidConstruction,
+        Loaded,
+
+        ValidStringFormatOK,
+        ValidStringFormatError,
+
+        ConvertedToBitOK,
+        ConvertedToBitError,
+
+        ConstructedOK,
+        ConstructedError,
+
+        TagOK,
+
         InvalidCompanyPrefix,
-        InvalidItemReference
+        InvalidItemReference,
+        InvalidFilterValue,
+        InvalidPartitionValue,
+        InvalidSerialReference
     }
 }

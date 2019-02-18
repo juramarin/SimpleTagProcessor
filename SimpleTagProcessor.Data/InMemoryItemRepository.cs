@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SimpleTagProcessor.Data
 {
@@ -123,7 +121,6 @@ namespace SimpleTagProcessor.Data
 
         public List<Item> GetAllItems()
         {
-
             return null;
         }
     }

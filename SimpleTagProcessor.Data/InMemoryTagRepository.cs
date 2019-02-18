@@ -1,31 +1,32 @@
 ﻿using SimpleTagProcessor.Domain;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SimpleTagProcessor.Data
 {
     public class InMemoryTagRepository : ITagRepository
     {
-
         public InMemoryTagRepository()
         {
         }
 
-        public IEnumerable<Tag> GetUnprocessedTags()
+        public IEnumerable<Tag> LoadTags()
         {
-            List<Tag> unprocessedTags = new List<Tag>();
-            foreach (var unporcessedTag in sampleTags)
+            List<Tag> tags = new List<Tag>();
+            foreach (var tag in sampleTags)
             {
                 Tag newTag = new Tag();
                 newTag.Isvalid = false;
-                newTag.HexStringValue = unporcessedTag;
-                newTag.Status = TagStatus.UnprocessedTag;
-                unprocessedTags.Add(newTag);
+                newTag.HexStringValue = tag;
+                newTag.Status = TagStatus.Loaded;
+                tags.Add(newTag);
             }
 
-            return unprocessedTags; ;
+            return tags;
         }
+
+        private List<string> problematicTags = new List<string> {
+            "3074257BF7194E4000001A85"
+        };
 
         private List<string> sampleTags = new List<string> {
             "3074257BF7194E4000001A85",

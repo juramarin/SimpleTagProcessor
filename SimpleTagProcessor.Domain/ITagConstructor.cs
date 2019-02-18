@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace SimpleTagProcessor.Domain
+﻿namespace SimpleTagProcessor.Domain
 {
     public interface ITagConstructor
     {
-        void ProcessTags(IEnumerable<Tag> tags);
+        void ProcessTags(Tag tag);
     }
 }

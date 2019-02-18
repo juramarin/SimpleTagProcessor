@@ -1,6 +1,7 @@
 ﻿using SimpleTagProcessor.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleTagProcessor.Domain
 {
@@ -9,8 +10,40 @@ namespace SimpleTagProcessor.Domain
         private ITagRepository _tagRepository;
         private ITagHexStringValidator _tagStringValidator;
         private ITagConstructor _tagConstructor;
-
         private IEnumerable<Tag> _tags;
+
+        public int GetProductCount(int companyPrefix, int itemReference)
+        {
+            return _tags.Where(t => t.CompanyPrefix == companyPrefix && t.ItemReference == itemReference).Count();
+        }
+
+        public IEnumerable<string> ListSerialNumbersForProduct(int companyPrefix, int itemReference)
+        {
+            List<string> serialNumbers = new List<string>();
+            int lines = 1;
+            foreach (var tag in _tags.Where(t => t.CompanyPrefix == companyPrefix && t.ItemReference == itemReference))
+            {
+                string product = String.Format("{4}  {0}  Company Prefix: {1}, Item Reference: {2}, Serial: {3}",
+                    tag.HexStringValue, tag.CompanyPrefix, tag.ItemReference, tag.SerialReference, lines);
+                serialNumbers.Add(product);
+                lines++;
+            }
+            return serialNumbers;
+        }
+
+        public IEnumerable<string> GetAllInvalidTags()
+        {
+            List<string> serialNumbers = new List<string>();
+            int lines = 1;
+            foreach (var tag in _tags.Where(t => t.Status != TagStatus.TagOK))
+            {
+                string product = String.Format("{4}  {0}  Company Prefix: {1}, Item Reference: {2}, Serial: {3}",
+                    tag.HexStringValue, tag.CompanyPrefix, tag.ItemReference, tag.SerialReference, lines);
+                serialNumbers.Add(product);
+                lines++;
+            }
+            return serialNumbers;
+        }
 
         public TagProcessor(ITagRepository tagRepository, ITagHexStringValidator tagStringValidator, ITagConstructor tagConstructor)
         {
@@ -18,60 +51,106 @@ namespace SimpleTagProcessor.Domain
             _tagStringValidator = tagStringValidator;
             _tagConstructor = tagConstructor;
 
-            LoadUnprocessedTags();
-            ValidateUnprocessedTags();
+            LoadTags();
+            ValidateLoadedTags();
+            ConvertHexToBitTags();
             ProcessTags();
+            ValidateItemReference();
+
+            //ShowValidtags();
+            //ShowInValidtags();
         }
 
-        private void ProcessTags()
+        private void ValidateItemReference()
         {
-            _tagConstructor.ProcessTags(_tags);
-        }
-
-        private void LoadUnprocessedTags()
-        {
-            _tags = _tagRepository.GetUnprocessedTags();
-        }
-
-
-        private void ValidateUnprocessedTags()
-        {
-            foreach (var unprocessedTag in _tags)
+            // TODO - (If needed) Added comparison of constructed Company Prefix and Item Reference with existing from InMemoryCompanyRepository
+            foreach (var tag in _tags.Where(t => t.Status == TagStatus.ConstructedOK))
             {
-                if (_tagStringValidator.IsValidTagHexString(unprocessedTag.HexStringValue))
+                tag.Status = TagStatus.TagOK;
+            }
+        }
+
+        private void LoadTags()
+        {
+            _tags = _tagRepository.LoadTags();
+        }
+
+        private void ValidateLoadedTags()
+        {
+            foreach (var tag in _tags)
+            {
+                try
                 {
-                    var bitStringValue = HexBinaryConverter.HexToBinary(unprocessedTag.HexStringValue);
-                    unprocessedTag.BitStringValue = bitStringValue;
-                    unprocessedTag.Status = TagStatus.ConvertedToBit;
+                    if (_tagStringValidator.IsValidTagHexString(tag.HexStringValue))
+                    {
+                        tag.Status = TagStatus.ValidStringFormatOK;
+                    }
+                    else
+                    {
+                        tag.Status = TagStatus.ValidStringFormatError;
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    unprocessedTag.Status = TagStatus.InvalidHEXValue;
+                    tag.Status = TagStatus.ValidStringFormatError;
+                    Console.WriteLine("Unprocessed Tag: {0}", tag.HexStringValue);
                 }
             }
         }
 
-
-
-        public int GetProductCount(int companyPrefix, int itemReference)
+        private void ConvertHexToBitTags()
         {
-
-            throw new NotImplementedException();
+            foreach (var tag in _tags.Where(t => t.Status == TagStatus.ValidStringFormatOK))
+            {
+                try
+                {
+                    var bitStringValue = HexBinaryConverter.HexToBinary(tag.HexStringValue);
+                    tag.BitStringValue = bitStringValue;
+                    tag.Status = TagStatus.ConvertedToBitOK;
+                }
+                catch (Exception)
+                {
+                    tag.Status = TagStatus.ConvertedToBitError;
+                    Console.WriteLine("Not ConvertedToHex Tag: {0}", tag.HexStringValue);
+                }
+            }
         }
 
-        public IEnumerable<int> GetAllSerialNumbersForProduct(int companyPrefix, int itemReference)
+        private void ProcessTags()
         {
-            throw new NotImplementedException();
+            foreach (var tag in _tags.Where(t => t.Status == TagStatus.ConvertedToBitOK))
+            {
+                try
+                {
+                    _tagConstructor.ProcessTags(tag);
+                    tag.Status = TagStatus.ConstructedOK;
+                }
+                catch (Exception)
+                {
+                    tag.Status = TagStatus.ConstructedError;
+                    Console.WriteLine("Not Processed Tag: {0}", tag.HexStringValue);
+                }
+            }
         }
 
-        public IEnumerable<string> GetAllInvalidTags()
+        private void ShowInValidtags()
         {
-            throw new NotImplementedException();
+            int counter = 1;
+            foreach (var tag in _tags.Where(t => t.Status != TagStatus.TagOK))
+            {
+                Console.WriteLine("{3} record: Tag: {0}, TagStatus: {1},  Bit: {2}", tag.HexStringValue, tag.Status.ToString(), tag.BitStringValue ?? "is nullish", counter);
+                counter++;
+            }
         }
 
-        //private void ValidateTagSourceName(string tagSourceName)
-        //{
-        //    if (string.IsNullOrWhiteSpace(tagSourceName)) throw new ArgumentException("Tag Source Name must be entered", "tagSourceName");
-        //}
+        private void ShowValidtags()
+        {
+            int counter = 1;
+            foreach (var tag in _tags.Where(t => t.Status == TagStatus.TagOK))
+            {
+                Console.WriteLine("{3} record: Valid Tag: {0}, TagStatus: {1},  Bit: {2}", tag.HexStringValue, tag.Status.ToString(), tag.BitStringValue ?? "is nullish", counter);
+                counter++;
+            }
+        }
     }
 }

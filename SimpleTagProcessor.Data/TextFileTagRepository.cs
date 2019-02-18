@@ -10,10 +10,9 @@ namespace SimpleTagProcessor.Data
 
         public TextFileTagRepository()
         {
-
         }
 
-        public IEnumerable<Tag> GetUnprocessedTags()
+        public IEnumerable<Tag> LoadTags()
         {
             throw new NotImplementedException();
         }

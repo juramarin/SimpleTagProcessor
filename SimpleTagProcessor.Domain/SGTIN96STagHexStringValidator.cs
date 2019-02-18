@@ -7,7 +7,7 @@ namespace SimpleTagProcessor.Domain
         private const int SGTIN96_STRING_LENGTH = 24;
         private const string SGTIN96_HEADER_VALUE = "30";
 
-        public  bool IsValidTagHexString(string tagString)
+        public bool IsValidTagHexString(string tagString)
         {
             if (string.IsNullOrWhiteSpace(tagString)) throw new ArgumentException("Tag String must NOT be null or empty", "tagString");
             var a = IsRequiredLength(tagString);

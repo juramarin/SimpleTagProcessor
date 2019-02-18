@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace SimpleTagProcessor.Common
@@ -23,7 +22,6 @@ namespace SimpleTagProcessor.Common
 
         public static string BinaryToHex(string binary)
         {
-            // pad to a multiple of sixteen, according to TDS standard
             int length = binary.Length;
             if (length % 16 != 0)
             {
@@ -43,7 +41,3 @@ namespace SimpleTagProcessor.Common
         }
     }
 }
-
-
-
-

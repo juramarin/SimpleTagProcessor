@@ -4,6 +4,6 @@ namespace SimpleTagProcessor.Domain
 {
     public interface ITagRepository
     {
-        IEnumerable<Tag> GetUnprocessedTags();
+        IEnumerable<Tag> LoadTags();
     }
 }
