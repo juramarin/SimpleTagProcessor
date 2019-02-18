@@ -1,14 +1,20 @@
-﻿using System;
+﻿using SimpleTagProcessor.Domain;
+using System;
+using System.Collections.Generic;
 
 namespace SimpleTagProcessor.Data
 {
     public class TextFileTagRepository : ITagRepository
     {
-        private readonly string _tagSource;
+        private const string _fileName = "tags.txt";
 
-        public TextFileTagRepository(string tagSource)
+        public TextFileTagRepository()
         {
-            _tagSource = tagSource;
+        }
+
+        public IEnumerable<Tag> LoadTags()
+        {
+            throw new NotImplementedException();
         }
     }
 }

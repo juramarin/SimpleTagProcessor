@@ -1,6 +1,6 @@
 ﻿namespace SimpleTagProcessor.Data
 {
-    public interface ITagRepository
+    public interface ICompanyRepository
     {
     }
 }
