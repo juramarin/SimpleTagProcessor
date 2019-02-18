@@ -4,8 +4,4 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleTagProcessor.Common\SimpleTagProcessor.Common.csproj" />
-  </ItemGroup>
-
 </Project>
