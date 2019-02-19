@@ -5,12 +5,27 @@ using System.Linq;
 
 namespace SimpleTagProcessor.Domain
 {
-    public class TagProcessor
+    public class TagProcessor : ITagProcessor
     {
-        private ITagRepository _tagRepository;
-        private ITagHexStringValidator _tagStringValidator;
-        private ITagConstructor _tagConstructor;
-        private IEnumerable<Tag> _tags;
+        protected ITagRepository _tagRepository;
+        protected ITagHexStringValidator _tagStringValidator;
+        protected ITagConstructor _tagConstructor;
+        protected IEnumerable<Tag> _tags;
+
+        public TagProcessor()
+        {
+
+        }
+
+        public TagProcessor(ITagRepository tagRepository, ITagHexStringValidator tagStringValidator, ITagConstructor tagConstructor)
+        {
+            _tagRepository = tagRepository;
+            _tagStringValidator = tagStringValidator;
+            _tagConstructor = tagConstructor;
+
+            BatchTagProcessing();
+        }
+
 
         public int GetProductCount(int companyPrefix, int itemReference)
         {
@@ -45,29 +60,21 @@ namespace SimpleTagProcessor.Domain
             return serialNumbers;
         }
 
-        public TagProcessor(ITagRepository tagRepository, ITagHexStringValidator tagStringValidator, ITagConstructor tagConstructor)
-        {
-            _tagRepository = tagRepository;
-            _tagStringValidator = tagStringValidator;
-            _tagConstructor = tagConstructor;
 
+        public virtual Tag DecodeEpcTag(string epcTag)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        private void BatchTagProcessing()
+        {
             LoadTags();
             ValidateLoadedTags();
             ConvertHexToBitTags();
             ProcessTags();
             ValidateItemReference();
-
-            //ShowValidtags();
-            //ShowInValidtags();
-        }
-
-        private void ValidateItemReference()
-        {
-            // TODO - (If needed) Added comparison of constructed Company Prefix and Item Reference with existing from InMemoryCompanyRepository
-            foreach (var tag in _tags.Where(t => t.Status == TagStatus.ConstructedOK))
-            {
-                tag.Status = TagStatus.TagOK;
-            }
         }
 
         private void LoadTags()
@@ -75,7 +82,7 @@ namespace SimpleTagProcessor.Domain
             _tags = _tagRepository.LoadTags();
         }
 
-        private void ValidateLoadedTags()
+        protected void ValidateLoadedTags()
         {
             foreach (var tag in _tags)
             {
@@ -83,24 +90,24 @@ namespace SimpleTagProcessor.Domain
                 {
                     if (_tagStringValidator.IsValidTagHexString(tag.HexStringValue))
                     {
-                        tag.Status = TagStatus.ValidStringFormatOK;
+                        tag.Status = TagStatus.TagStringFormatOK;
                     }
                     else
                     {
-                        tag.Status = TagStatus.ValidStringFormatError;
+                        tag.Status = TagStatus.TagStringFormatError;
                     }
                 }
                 catch (Exception)
                 {
-                    tag.Status = TagStatus.ValidStringFormatError;
+                    tag.Status = TagStatus.TagStringFormatError;
                     Console.WriteLine("Unprocessed Tag: {0}", tag.HexStringValue);
                 }
             }
         }
 
-        private void ConvertHexToBitTags()
+        protected void ConvertHexToBitTags()
         {
-            foreach (var tag in _tags.Where(t => t.Status == TagStatus.ValidStringFormatOK))
+            foreach (var tag in _tags.Where(t => t.Status == TagStatus.TagStringFormatOK))
             {
                 try
                 {
@@ -116,7 +123,7 @@ namespace SimpleTagProcessor.Domain
             }
         }
 
-        private void ProcessTags()
+        protected void ProcessTags()
         {
             foreach (var tag in _tags.Where(t => t.Status == TagStatus.ConvertedToBitOK))
             {
@@ -132,6 +139,17 @@ namespace SimpleTagProcessor.Domain
                 }
             }
         }
+
+        protected void ValidateItemReference()
+        {
+            // TODO - (If needed) Added comparison of constructed Company Prefix and Item Reference with existing from InMemoryCompanyRepository
+            foreach (var tag in _tags.Where(t => t.Status == TagStatus.ConstructedOK))
+            {
+                tag.Status = TagStatus.TagOK;
+            }
+        }
+
+
 
         private void ShowInValidtags()
         {
