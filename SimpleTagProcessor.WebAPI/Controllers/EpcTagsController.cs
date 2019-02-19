@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SimpleTagProcessor.Data;
 using SimpleTagProcessor.Domain;
 using SimpleTagProcessor.WebAPI.Models;
+using System;
+using System.Collections.Generic;
 
 namespace SimpleTagProcessor.WebAPI.Controllers
 {
@@ -14,6 +11,15 @@ namespace SimpleTagProcessor.WebAPI.Controllers
     [ApiController]
     public class EpcTagsController : ControllerBase
     {
+        private readonly ITagProcessorFactory _tagProcessorFactory;
+        private readonly ITagProcessor _tagProcessor;
+
+        public EpcTagsController(ITagProcessorFactory tagProcessorFactory)
+        {
+            _tagProcessorFactory = tagProcessorFactory;
+            _tagProcessor = _tagProcessorFactory.GetSingleTagProcessor(TagType.SGTIN_96);
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
@@ -27,10 +33,7 @@ namespace SimpleTagProcessor.WebAPI.Controllers
 
             try
             {
-                TagProcessorFactory tagProcessorfactor = new TagProcessorFactory();
-                ITagProcessor tagProcessor = tagProcessorfactor.GetSingleTagProcessor(TagType.SGTIN_96);
-
-                Tag tag = tagProcessor.DecodeEpcTag(singleTag);
+                Tag tag = _tagProcessor.DecodeEpcTag(singleTag);
                 if (tag == null) return NotFound();
                 if (tag.Status != TagStatus.TagOK)
                 {
