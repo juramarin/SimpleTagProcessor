@@ -4,8 +4,8 @@
     {
         Loaded,
 
-        ValidStringFormatOK,
-        ValidStringFormatError,
+        TagStringFormatOK,
+        TagStringFormatError,
 
         ConvertedToBitOK,
         ConvertedToBitError,

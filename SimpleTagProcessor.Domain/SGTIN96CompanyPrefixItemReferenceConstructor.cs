@@ -85,10 +85,14 @@ namespace SimpleTagProcessor.Domain
 
         public long GetCompanyPrefixValue()
         {
-            long result = Convert.ToInt64(_bitStringTag.Substring(COMPANY_PREFIX_START_POSITION, _companyPrefixLength), 2);            return result;        }
+            long result = Convert.ToInt64(_bitStringTag.Substring(COMPANY_PREFIX_START_POSITION, _companyPrefixLength), 2);
+            return result;
+        }
 
         public int GetItemReferenceValue()
         {
-            int result = Convert.ToInt32(_bitStringTag.Substring(_itemReferenceStartPosition, _itemReferenceLength), 2);            return result;        }
+            int result = Convert.ToInt32(_bitStringTag.Substring(_itemReferenceStartPosition, _itemReferenceLength), 2);
+            return result;
+        }
     }
 }
