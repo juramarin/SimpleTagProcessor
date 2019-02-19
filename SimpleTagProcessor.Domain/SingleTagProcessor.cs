@@ -19,7 +19,7 @@ namespace SimpleTagProcessor.Domain
             LoadSingleTag(epcTag);
             ValidateLoadedTags();
             ConvertHexToBitTags();
-            ProcessTags();
+            ConstructTags();
             ValidateItemReference();
 
             return _tags.SingleOrDefault();

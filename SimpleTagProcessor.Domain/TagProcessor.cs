@@ -73,7 +73,7 @@ namespace SimpleTagProcessor.Domain
             LoadTags();
             ValidateLoadedTags();
             ConvertHexToBitTags();
-            ProcessTags();
+            ConstructTags();
             ValidateItemReference();
         }
 
@@ -123,18 +123,17 @@ namespace SimpleTagProcessor.Domain
             }
         }
 
-        protected void ProcessTags()
+        protected void ConstructTags()
         {
             foreach (var tag in _tags.Where(t => t.Status == TagStatus.ConvertedToBitOK))
             {
                 try
                 {
-                    _tagConstructor.ProcessTags(tag);
+                    _tagConstructor.ConstructTag(tag);
                     tag.Status = TagStatus.ConstructedOK;
                 }
                 catch (Exception)
                 {
-                    tag.Status = TagStatus.ConstructedError;
                     Console.WriteLine("Not Processed Tag: {0}", tag.HexStringValue);
                 }
             }
@@ -151,7 +150,7 @@ namespace SimpleTagProcessor.Domain
 
 
 
-        private void ShowInValidtags()
+        private void ShowInvalidTags()
         {
             int counter = 1;
             foreach (var tag in _tags.Where(t => t.Status != TagStatus.TagOK))
