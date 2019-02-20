@@ -4,6 +4,8 @@ namespace SimpleTagProcessor.Data
 {
     public interface ITagProcessorFactory
     {
-        ITagProcessor GetTagProcessor(TagType tagType);
+        IBatchTagProcessor GetBatchTagProcessor(TagType tagType);
+
+        ISingleTagProcessor GetSingleTagProcessor(TagType tagType);
     }
 }

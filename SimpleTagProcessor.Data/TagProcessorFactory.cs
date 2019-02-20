@@ -1,15 +1,13 @@
 ﻿using SimpleTagProcessor.Domain;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SimpleTagProcessor.Data
 {
     public class TagProcessorFactory : ITagProcessorFactory
     {
-        public ITagProcessor GetTagProcessor (TagType tagType)
+        public IBatchTagProcessor GetBatchTagProcessor(TagType tagType)
         {
-            ITagProcessor tagProcessor;
+            IBatchTagProcessor tagProcessor;
 
             switch (tagType)
             {
@@ -17,8 +15,9 @@ namespace SimpleTagProcessor.Data
                     throw new NotImplementedException();
 
                 case TagType.SGTIN_96:
-                    tagProcessor = new TagProcessor(new InMemoryTagRepository(), new SGTIN96STagHexStringValidator(), new SGTIN96TagConstructor());
+                    tagProcessor = new TagProcessor(new InMemoryTagRepository(), new SGTIN96STagHexStringValidator(), new SGTIN96TagFieldsConstructor());
                     break;
+
                 case TagType.SGTIN_198:
                     throw new NotImplementedException();
 
@@ -29,9 +28,9 @@ namespace SimpleTagProcessor.Data
             return tagProcessor;
         }
 
-        public ITagProcessor GetSingleTagProcessor(TagType tagType)
+        public ISingleTagProcessor GetSingleTagProcessor(TagType tagType)
         {
-            ITagProcessor tagProcessor;
+            ISingleTagProcessor tagProcessor;
 
             switch (tagType)
             {
@@ -39,8 +38,9 @@ namespace SimpleTagProcessor.Data
                     throw new NotImplementedException();
 
                 case TagType.SGTIN_96:
-                    tagProcessor = new SingleTagProcessor(new InMemoryTagRepository(), new SGTIN96STagHexStringValidator(), new SGTIN96TagConstructor());
+                    tagProcessor = new TagProcessor(new SGTIN96STagHexStringValidator(), new SGTIN96TagFieldsConstructor());
                     break;
+
                 case TagType.SGTIN_198:
                     throw new NotImplementedException();
 

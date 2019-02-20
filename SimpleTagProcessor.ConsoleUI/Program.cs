@@ -11,11 +11,8 @@ namespace SimpleTagProcessor.ConsoleUI
         {
             try
             {
-                //TagProcessor tagProcessor = new TagProcessor(new InMemoryTagRepository(), new SGTIN96STagHexStringValidator(), new SGTIN96TagConstructor());
-
                 TagProcessorFactory tagProcessorfactor = new TagProcessorFactory();
-
-                ITagProcessor tagProcessor = tagProcessorfactor.GetTagProcessor(TagType.SGTIN_96);
+                IBatchTagProcessor tagProcessor = tagProcessorfactor.GetBatchTagProcessor(TagType.SGTIN_96);
 
                 // 69124   Mondelēz International,  1253252 Milka Oreo
                 int companyPrefix = 69124;
