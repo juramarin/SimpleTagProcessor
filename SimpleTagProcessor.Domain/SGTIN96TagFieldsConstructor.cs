@@ -1,11 +1,14 @@
 ﻿using SimpleTagProcessor.Domain.ConstructorStrategies;
+using System;
 
 namespace SimpleTagProcessor.Domain
 {
-    public class SGTIN96TagConstructor : ITagConstructor
+    public class SGTIN96TagFieldsConstructor : ITagFieldsConstructor
     {
-        public void ConstructTag(Tag tag)
+        public void ConstructTagFields(Tag tag)
         {
+            if (tag.Status != TagStatus.ConvertedToBitOK) throw new ArgumentException("Tag must have status ConvertedToBitOK", "tag");
+
             SGTIN96HeaderConstructor.ConstructHeader(tag);
             SGTIN96FilterConstructor.ConstructFilter(tag);
             SGTIN96PartitionConstructor.ConstructPartition(tag);

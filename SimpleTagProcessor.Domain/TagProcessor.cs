@@ -5,27 +5,38 @@ using System.Linq;
 
 namespace SimpleTagProcessor.Domain
 {
-    public class TagProcessor : ITagProcessor
+    public class TagProcessor : IBatchTagProcessor, ISingleTagProcessor
     {
         protected ITagRepository _tagRepository;
         protected ITagHexStringValidator _tagStringValidator;
-        protected ITagConstructor _tagConstructor;
+        protected ITagFieldsConstructor _tagFieldsConstructor;
         protected IEnumerable<Tag> _tags;
 
-        public TagProcessor()
-        {
-
-        }
-
-        public TagProcessor(ITagRepository tagRepository, ITagHexStringValidator tagStringValidator, ITagConstructor tagConstructor)
+        public TagProcessor(ITagRepository tagRepository, ITagHexStringValidator tagStringValidator, ITagFieldsConstructor tagFieldsConstructor)
         {
             _tagRepository = tagRepository;
             _tagStringValidator = tagStringValidator;
-            _tagConstructor = tagConstructor;
+            _tagFieldsConstructor = tagFieldsConstructor;
 
             BatchTagProcessing();
         }
 
+        public TagProcessor(ITagHexStringValidator tagStringValidator, ITagFieldsConstructor tagFieldsConstructor)
+        {
+            _tagStringValidator = tagStringValidator;
+            _tagFieldsConstructor = tagFieldsConstructor;
+        }
+
+        public Tag DecodeEpcTag(string epcTag)
+        {
+            LoadSingleTag(epcTag);
+            ValidateLoadedTags();
+            ConvertHexToBitTags();
+            ConstructTags();
+            ValidateItemReference();
+
+            return _tags.SingleOrDefault();
+        }
 
         public int GetProductCount(int companyPrefix, int itemReference)
         {
@@ -60,14 +71,6 @@ namespace SimpleTagProcessor.Domain
             return serialNumbers;
         }
 
-
-        public virtual Tag DecodeEpcTag(string epcTag)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
         private void BatchTagProcessing()
         {
             LoadTags();
@@ -80,6 +83,17 @@ namespace SimpleTagProcessor.Domain
         private void LoadTags()
         {
             _tags = _tagRepository.LoadTags();
+        }
+
+        private void LoadSingleTag(string singleTag)
+        {
+            List<Tag> singleTagList = new List<Tag>();
+            Tag newTag = new Tag();
+            newTag.Isvalid = false;
+            newTag.HexStringValue = singleTag;
+            newTag.Status = TagStatus.Loaded;
+            singleTagList.Add(newTag);
+            _tags = singleTagList;
         }
 
         protected void ValidateLoadedTags()
@@ -129,7 +143,7 @@ namespace SimpleTagProcessor.Domain
             {
                 try
                 {
-                    _tagConstructor.ConstructTag(tag);
+                    _tagFieldsConstructor.ConstructTagFields(tag);
                     tag.Status = TagStatus.ConstructedOK;
                 }
                 catch (Exception)
@@ -148,8 +162,6 @@ namespace SimpleTagProcessor.Domain
             }
         }
 
-
-
         private void ShowInvalidTags()
         {
             int counter = 1;
@@ -160,7 +172,7 @@ namespace SimpleTagProcessor.Domain
             }
         }
 
-        private void ShowValidtags()
+        private void ShowValidTags()
         {
             int counter = 1;
             foreach (var tag in _tags.Where(t => t.Status == TagStatus.TagOK))

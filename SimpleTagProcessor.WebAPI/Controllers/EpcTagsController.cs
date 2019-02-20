@@ -12,7 +12,7 @@ namespace SimpleTagProcessor.WebAPI.Controllers
     public class EpcTagsController : ControllerBase
     {
         private readonly ITagProcessorFactory _tagProcessorFactory;
-        private readonly ITagProcessor _tagProcessor;
+        private readonly ISingleTagProcessor _tagProcessor;
 
         public EpcTagsController(ITagProcessorFactory tagProcessorFactory)
         {
