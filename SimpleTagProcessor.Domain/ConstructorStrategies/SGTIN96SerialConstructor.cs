@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleTagProcessor.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,11 +14,15 @@ namespace SimpleTagProcessor.Domain.ConstructorStrategies
         {
             try
             {
+                if (tag.Status != TagStatus.ItemReferenceOK) throw new InvalidOperationException("ConstructReference, wrong tag processing sequence");
+                if (!BitStringValidator.IsValidSGTIN96BitString(tag.BitStringValue)) throw new ArgumentException("ConstructReference, Invalid bitString");
+
                 tag.SerialReference = Convert.ToInt64(tag.BitStringValue.Substring(SERIALREFERENCE_START_POSITION, SERIALREFERENCE_LENGTH), 2);
+                tag.Status = TagStatus.SerialReferenceOK;
             }
             catch (Exception)
             {
-                tag.Status = TagStatus.InvalidSerialReference;
+                tag.Status = TagStatus.SerialReferenceError;
                 throw;
             }
         }

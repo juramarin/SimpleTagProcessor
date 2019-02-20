@@ -15,10 +15,22 @@
 
         TagOK,
 
-        InvalidCompanyPrefix,
-        InvalidItemReference,
-        InvalidFilterValue,
-        InvalidPartitionValue,
-        InvalidSerialReference
+        HeaderValueError,
+        HeaderValueOK,
+
+        FilterValueError,
+        FilterValueOK,
+
+        PartitionValueError,
+        PartitionValueOK,
+
+        CompanyPrefixError,
+        CompanyPrefixOK,
+
+        ItemReferenceError,
+        ItemReferenceOK,
+
+        SerialReferenceError,
+        SerialReferenceOK,
     }
 }

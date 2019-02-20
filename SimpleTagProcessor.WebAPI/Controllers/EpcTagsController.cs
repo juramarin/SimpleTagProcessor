@@ -52,7 +52,7 @@ namespace SimpleTagProcessor.WebAPI.Controllers
         private EpcTag CreateEpcTag(Tag tag)
         {
             EpcTag epcTag = new EpcTag();
-            epcTag.Version = "1.0.0";
+            epcTag.Version = "2.0.0";
             epcTag.TagStatus = tag.Status.ToString();
             epcTag.Tag = new EpcTagMetadata()
             {

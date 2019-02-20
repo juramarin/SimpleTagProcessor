@@ -12,7 +12,12 @@ namespace SimpleTagProcessor.ConsoleUI
             try
             {
                 TagProcessorFactory tagProcessorfactor = new TagProcessorFactory();
-                IBatchTagProcessor tagProcessor = tagProcessorfactor.GetBatchTagProcessor(TagType.SGTIN_96);
+
+                //TODO copy tags.txt to a custom directory and uncomment code below otherwise, use default in-memory tags
+                IBatchTagProcessor tagProcessor = tagProcessorfactor.GetBatchTagProcessor(TagType.SGTIN_96, "C:\\tmp\\tags.txt");
+
+                //Using default in-memory tags
+                //IBatchTagProcessor tagProcessor = tagProcessorfactor.GetBatchTagProcessor(TagType.SGTIN_96);
 
                 // 69124   Mondelēz International,  1253252 Milka Oreo
                 int companyPrefix = 69124;
@@ -37,9 +42,9 @@ namespace SimpleTagProcessor.ConsoleUI
 
                 Console.ReadLine();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO Logging unhandled exceptions
+                Console.WriteLine(ex.Message);
                 throw;
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleTagProcessor.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,7 +15,12 @@ namespace SimpleTagProcessor.Domain.ConstructorStrategies
         {
             try
             {
+                if (tag.Status != TagStatus.FilterValueOK) throw new InvalidOperationException("ConstructPartition, wrong tag processing sequence");
+                if (!BitStringValidator.IsValidSGTIN96BitString(tag.BitStringValue)) throw new ArgumentException("ConstructPartition, Invalid bitString");
+
                 tag.Partition = Convert.ToInt32(tag.BitStringValue.Substring(PARTITION_START_POSITION, PARTITION_LENGTH), 2);
+                tag.Status = TagStatus.PartitionValueOK;
+
                 if (tag.Partition > PARTITION_MAX_VALUE)
                 {
                     throw new ArgumentException("Parititon value out of range", "Partition");
@@ -22,7 +28,7 @@ namespace SimpleTagProcessor.Domain.ConstructorStrategies
             }
             catch (Exception)
             {
-                tag.Status = TagStatus.InvalidPartitionValue;
+                tag.Status = TagStatus.PartitionValueError;
                 throw;
             }
         }

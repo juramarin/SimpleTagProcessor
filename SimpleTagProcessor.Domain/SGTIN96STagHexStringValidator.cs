@@ -10,11 +10,7 @@ namespace SimpleTagProcessor.Domain
         public bool IsValidTagHexString(string tagString)
         {
             if (string.IsNullOrWhiteSpace(tagString)) throw new ArgumentException("Tag String must NOT be null or empty", "tagString");
-            var a = IsRequiredLength(tagString);
-            var b = IsHeaderCorrect(tagString);
-            var c = IsStringHexNumber(tagString);
-
-            return a && b && c;
+            return IsRequiredLength(tagString) && IsHeaderCorrect(tagString) && IsStringHexNumber(tagString);
         }
 
         private bool IsRequiredLength(string tagString)

@@ -1,9 +1,30 @@
-﻿using System;
+﻿using SimpleTagProcessor.Common;
+using System;
 
 namespace SimpleTagProcessor.Domain.ConstructorStrategies
 {
     public static class SGTIN96ItemReferenceConstructor
     {
+        public static void ConstructItemReference(Tag tag)
+        {
+            try
+            {
+                if (tag.Status != TagStatus.CompanyPrefixOK) throw new InvalidOperationException("ConstructItemReference, wrong tag processing sequence");
+                if (!BitStringValidator.IsValidSGTIN96BitString(tag.BitStringValue)) throw new ArgumentException("ConstructItemReference, Invalid bitString");
+
+                var itemReferenceStartPosition = GetItemReferenceStartPosition(tag.Partition);
+                var itemReferenceLength = GetItemReferenceLength(tag.Partition);
+
+                tag.ItemReference = Convert.ToInt32(tag.BitStringValue.Substring(itemReferenceStartPosition, itemReferenceLength), 2);
+                tag.Status = TagStatus.ItemReferenceOK;
+            }
+            catch (Exception)
+            {
+                tag.Status = TagStatus.ItemReferenceError;
+                throw;
+            }
+        }
+
         private static int GetItemReferenceStartPosition(int partitionValue)
         {
             switch (partitionValue)
@@ -61,21 +82,6 @@ namespace SimpleTagProcessor.Domain.ConstructorStrategies
 
                 default:
                     throw new ArgumentException("Partition value must be between 0 and 6");
-            }
-        }
-
-        public static void ConstructItemReference(Tag tag)
-        {
-            try
-            {
-                var itemReferenceStartPosition = GetItemReferenceStartPosition(tag.Partition);
-                var itemReferenceLength = GetItemReferenceLength(tag.Partition);
-                tag.ItemReference = Convert.ToInt32(tag.BitStringValue.Substring(itemReferenceStartPosition, itemReferenceLength), 2);
-            }
-            catch (Exception)
-            {
-                tag.Status = TagStatus.InvalidItemReference;
-                throw;
             }
         }
     }

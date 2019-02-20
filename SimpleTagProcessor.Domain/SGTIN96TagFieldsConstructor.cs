@@ -7,6 +7,7 @@ namespace SimpleTagProcessor.Domain
     {
         public void ConstructTagFields(Tag tag)
         {
+            if (tag == null) throw new ArgumentException("ConstructTagFields, tag must not be null", "tag");
             if (tag.Status != TagStatus.ConvertedToBitOK) throw new ArgumentException("Tag must have status ConvertedToBitOK", "tag");
 
             SGTIN96HeaderConstructor.ConstructHeader(tag);

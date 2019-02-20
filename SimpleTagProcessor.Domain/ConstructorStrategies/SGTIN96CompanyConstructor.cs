@@ -1,10 +1,35 @@
-﻿using System;
+﻿using SimpleTagProcessor.Common;
+using System;
 
 namespace SimpleTagProcessor.Domain.ConstructorStrategies
 {
     public static class SGTIN96CompanyConstructor
     {
         private const int COMPANY_PREFIX_START_POSITION = 14;
+
+        public static void ConstructCompanyPrefix(Tag tag)
+        {
+            try
+            {
+                if (tag.Status != TagStatus.PartitionValueOK) throw new InvalidOperationException("ConstructCompanyPrefix, wrong tag processing sequence");
+                if (!BitStringValidator.IsValidSGTIN96BitString(tag.BitStringValue)) throw new ArgumentException("ConstructCompanyPrefix, Invalid bitString");
+
+                tag.CompanyPrefix = GetCompanyPrefixValue(tag.Partition, tag.BitStringValue);
+                tag.Status = TagStatus.CompanyPrefixOK;
+            }
+            catch (Exception)
+            {
+                tag.Status = TagStatus.CompanyPrefixError;
+                throw;
+            }
+        }
+
+        private static long GetCompanyPrefixValue(int partitionValue, string bitStringValue)
+        {
+            int companyBitLength = GetCompanyBitLength(partitionValue);
+            long result = Convert.ToInt64(bitStringValue.Substring(COMPANY_PREFIX_START_POSITION, companyBitLength), 2);
+            return result;
+        }
 
         private static int GetCompanyBitLength(int partitionValue)
         {
@@ -34,26 +59,6 @@ namespace SimpleTagProcessor.Domain.ConstructorStrategies
                 default:
                     throw new ArgumentException("Partition value must be between 0 and 6");
             }
-        }
-
-        public static void ConstructCompanyPrefix(Tag tag)
-        {
-            try
-            {
-                tag.CompanyPrefix = GetCompanyPrefixValue(tag.Partition, tag.BitStringValue);
-            }
-            catch (Exception)
-            {
-                tag.Status = TagStatus.InvalidCompanyPrefix;
-                throw;
-            }
-        }
-
-        private static long GetCompanyPrefixValue(int partitionValue, string bitStringValue)
-        {
-            int companyBitLength = GetCompanyBitLength(partitionValue);
-            long result = Convert.ToInt64(bitStringValue.Substring(COMPANY_PREFIX_START_POSITION, companyBitLength), 2);
-            return result;
         }
     }
 }

@@ -148,7 +148,7 @@ namespace SimpleTagProcessor.Domain
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Not Processed Tag: {0}", tag.HexStringValue);
+                    Console.WriteLine("Not Constructed Tag: {0}", tag.HexStringValue);
                 }
             }
         }
